@@ -1,0 +1,3 @@
+%{
+  "easy_ssl": {:hex, :easy_ssl, "1.1.2", "51150a00a1bb534e89909ded959d2903d6de5eebab8d38d07643ffe630be470f", [:mix], [], "hexpm", "04f08622cb9015a1b431c53f6a22d73689e7fd9d0fa8c76f5442eeb1c08783cc"},
+}
