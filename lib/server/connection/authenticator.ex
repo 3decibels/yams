@@ -12,12 +12,10 @@ defmodule Msg.Server.Connection.Authenticator do
   If authentication is successful the socket will be placed into a `Msg.Server.Connection`
   to be run under the specified dynamic `supervisor`.
 
-  This function is used for the side effect only. It returns no data.
+  This function is used for the side effect only. Returns tuple `{:ok, pid}` with the pid
+  of the started authentication task. The result of the task is not returned.
   """
-  def authenticate(tls_socket, supervisor) do
-    {:ok, pid} = Task.start(__MODULE__, :run, [tls_socket, supervisor])
-    :ssl.controlling_process(tls_socket, pid)
-  end
+  def authenticate(tls_socket, supervisor), do: Task.start(__MODULE__, :run, [tls_socket, supervisor])
 
 
   @doc """

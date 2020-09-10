@@ -25,7 +25,10 @@ defmodule Msg.Server.Connection do
 
 
   @impl true
-  def init(%Connection{tls_socket: _tls_socket} = conn), do: {:ok, conn}
+  def init(%Connection{tls_socket: tls_socket} = conn) do
+    :ssl.controlling_process(tls_socket, self())
+    {:ok, conn}
+  end
 
 
   @impl true
