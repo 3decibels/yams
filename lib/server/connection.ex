@@ -25,9 +25,7 @@ defmodule Msg.Server.Connection do
 
 
   @impl true
-  def init(%Connection{tls_socket: _tls_socket} = conn) do
-    {:ok, conn}
-  end
+  def init(%Connection{tls_socket: _tls_socket} = conn), do: {:ok, conn}
 
 
   @impl true

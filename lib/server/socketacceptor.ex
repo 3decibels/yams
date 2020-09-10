@@ -13,9 +13,7 @@ defmodule Msg.Server.SocketAcceptor do
   @doc """
   Starts a `Msg.Server.SocketAcceptor` process linked to the current process
   """
-  def start_link(listen_socket) do
-    Task.start_link(__MODULE__, :accept_loop, [listen_socket])
-  end
+  def start_link(listen_socket), do: Task.start_link(__MODULE__, :accept_loop, [listen_socket])
 
 
   @doc """
