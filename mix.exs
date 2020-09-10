@@ -21,7 +21,9 @@ defmodule Msg.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:easy_ssl, "~> 1.1.1"}
+      {:easy_ssl, "~> 1.1.1"},
+      {:ex_doc, "~> 0.22.2"},
+      {:protobuf, "~> 0.7.1"}
     ]
   end
 end
