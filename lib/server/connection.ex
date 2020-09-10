@@ -4,7 +4,7 @@ defmodule Msg.Server.Connection do
   """
   use GenServer
   alias __MODULE__
-  defstruct socket: nil, tls_socket: nil, client_name: nil, unique_id: nil
+  defstruct tls_socket: nil, client_name: nil, unique_id: nil
 
   @doc """
   Starts a `Msg.Server.Connection` process linked to the current process
@@ -25,13 +25,13 @@ defmodule Msg.Server.Connection do
 
 
   @impl true
-  def init(%Connection{socket: socket, tls_socket: tls_socket} = conn) do
+  def init(%Connection{tls_socket: _tls_socket} = conn) do
     {:ok, conn}
   end
 
 
   @impl true
-  def handle_call({:send_msg, msg}, from_pid, %Connection{tls_socket: tls_socket} = conn) do
+  def handle_call({:send_msg, msg}, _from_pid, %Connection{tls_socket: tls_socket} = conn) do
     response = :ssl.send(tls_socket, msg)
     {:reply, response, conn}
   end
@@ -45,7 +45,7 @@ defmodule Msg.Server.Connection do
   @doc """
   Pads a protobuf base128 variant bitstring into a binary and converts into an integer
   """
-  def protobuf_bitstring_to_int(<<msb::1, lsb::bitstring>> data) when is_bitstring(data) do
+  def protobuf_bitstring_to_int(<<msb::1, lsb::bitstring>> = data) when is_bitstring(data) do
     padding_bits = 8 - bit_size(data)
     <<int::integer-signed>> = <<msb::bitstring, 0::size(padding_bits), lsb::bitstring>>
     int

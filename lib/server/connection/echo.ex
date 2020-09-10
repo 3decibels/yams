@@ -14,7 +14,7 @@ defmodule Msg.Server.Connection.Echo do
   end
 
 
-  impl true
+  @impl true
   def init(%Echo{tls_socket: _tls_socket} = conn) do
     {:ok, conn}
   end

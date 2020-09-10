@@ -13,34 +13,21 @@ defmodule Msg.Server.SocketAcceptor do
   @doc """
   Starts a `Msg.Server.SocketAcceptor` process linked to the current process
   """
-  def start_link(port) do
-    Task.start_link(__MODULE__, :accept, [port])
+  def start_link(listen_socket) do
+    Task.start_link(__MODULE__, :accept_loop, [listen_socket])
   end
 
 
   @doc """
-  Listens on the specified TCP `port` number for incomming connections to accept.
-
-  Accepted connections are passed off to a `Msg.Server.Connection.Authenticator` task
-  for further processing.
-  """
-  def accept(port) when is_integer(port) do
-    :ssl.start()
-    {:ok, listen_socket} = :gen_tcp.listen(port, [reuseaddr: true, active: false])
-    accept_loop(listen_socket)
-  end
-
-
-  @doc """
-  Accepts incomming connections on the supplied `listen_socket` and passes the resulting
+  Accepts incomming TLS connections on the supplied `listen_socket` and passes the resulting
   socket off to a `Msg.Server.Connection.Authenticator` for further processing.
 
   Will continue listening until interrupted.
   """
-  defp accept_loop(listen_socket) do
-    {:ok, socket} = :gen_tcp.accept(listen_socket)
-    # Move TLS functions and authentication out to a separate task?
-    Authenticator.authenticate(socket, Msg.Server.ConnectionSupervisor)
+  def accept_loop(listen_socket) do
+    {:ok, transport_socket} = :ssl.transport_accept(listen_socket)
+    {:ok, ssl_socket} = :ssl.handshake(transport_socket)
+    Authenticator.authenticate(ssl_socket, Msg.Server.ConnectionSupervisor)
     accept_loop(listen_socket)
   end
 
