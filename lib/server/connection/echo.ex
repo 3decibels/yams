@@ -3,6 +3,7 @@ defmodule Msg.Server.Connection.Echo do
   This module implements a simple echo server on a TLS socket
   """
   use GenServer
+  require Logger
   alias Msg.Server.Connection
 
   @doc """
@@ -20,9 +21,16 @@ defmodule Msg.Server.Connection.Echo do
 
 
   @impl true
-  def handle_info({:ssl, _socket_info, data}, %Connection{tls_socket: tls_socket} = conn) do
+  def handle_info({:ssl, _socket, data}, %Connection{tls_socket: tls_socket} = conn) do
     :ssl.send(tls_socket, data)
-    {:no_response, conn}
+    {:noreply, conn}
+  end
+
+
+  @impl true
+  def handle_info({:ssl_closed, _socket}, %Connection{tls_socket: _tls_socket} = conn) do
+    Logger.info("Received TLS close, shutting down echo server")
+    {:stop, :normal, conn}
   end
 
 end

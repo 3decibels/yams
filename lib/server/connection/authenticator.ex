@@ -35,7 +35,8 @@ defmodule Msg.Server.Connection.Authenticator do
       false -> 
         {:error, :auth_failed}
       true -> 
-        {:ok, pid} = DynamicSupervisor.start_child(supervisor, {Connection, %Connection{tls_socket: tls_socket}})
+        #{:ok, pid} = DynamicSupervisor.start_child(supervisor, {Connection, %Connection{tls_socket: tls_socket}})
+        {:ok, pid} = DynamicSupervisor.start_child(supervisor, {Msg.Server.Connection.Echo, %Connection{tls_socket: tls_socket}})
         :ssl.controlling_process(tls_socket, pid)
         :ok
     end
