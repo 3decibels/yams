@@ -2,7 +2,7 @@ defmodule Msg.Server.Connection.Echo do
   @moduledoc """
   This module implements a simple echo server on a TLS socket
   """
-  use GenServer
+  use GenServer, restart: :transient
   require Logger
   alias Msg.Server.Connection
 
@@ -15,7 +15,8 @@ defmodule Msg.Server.Connection.Echo do
 
 
   @impl true
-  def init(%Connection{tls_socket: _tls_socket} = conn) do
+  def init(%Connection{tls_socket: tls_socket} = conn) do
+    :ssl.controlling_process(tls_socket, self())
     {:ok, conn}
   end
 

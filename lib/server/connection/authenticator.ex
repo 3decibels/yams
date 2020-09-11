@@ -6,6 +6,7 @@ defmodule Msg.Server.Connection.Authenticator do
   use Task
   alias Msg.Server.Connection
 
+
   @doc """
   Spawns a task to start TLS and perform authentication on a `socket`.
 
@@ -36,8 +37,7 @@ defmodule Msg.Server.Connection.Authenticator do
         {:error, :auth_failed}
       true -> 
         #{:ok, pid} = DynamicSupervisor.start_child(supervisor, {Connection, %Connection{tls_socket: tls_socket}})
-        {:ok, pid} = DynamicSupervisor.start_child(supervisor, {Msg.Server.Connection.Echo, %Connection{tls_socket: tls_socket}})
-        :ssl.controlling_process(tls_socket, pid)
+        {:ok, _pid} = DynamicSupervisor.start_child(supervisor, {Msg.Server.Connection.Echo, %Connection{tls_socket: tls_socket}})
         :ok
     end
   end

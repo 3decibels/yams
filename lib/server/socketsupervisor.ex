@@ -10,9 +10,7 @@ defmodule Msg.Server.SocketSupervisor do
   @doc """
   Starts a `Msg.Server.SocketSupervisor` process linked to the current process
   """
-  def start_link(port_number) when is_integer(port_number) do
-    Supervisor.start_link(__MODULE__, port_number, name: __MODULE__)
-  end
+  def start_link(port_number) when is_integer(port_number), do: Supervisor.start_link(__MODULE__, port_number, name: __MODULE__)
 
 
   @impl true
