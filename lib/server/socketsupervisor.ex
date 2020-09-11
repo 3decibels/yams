@@ -21,12 +21,13 @@ defmodule Msg.Server.SocketSupervisor do
     server_cert = Application.fetch_env!(:msg, :server_cert)
     server_key = Application.fetch_env!(:msg, :server_key)
 
+    # TODO: Add some error handling to check the certificate files exist
     # Open socket for listening
     {:ok, listen_socket} = :ssl.listen(port_number, [reuseaddr: true, cacertfile: ca_cert, certfile: server_cert,
       keyfile: server_key, verify: :verify_peer, fail_if_no_peer_cert: true])
 
-    children = for _ <- 1..4 do
-      {SocketAcceptor, [listen_socket]}
+    children = for n <- 1..4 do
+      Supervisor.child_spec({SocketAcceptor, listen_socket}, id: :"socket_acceptor#{n}")
     end
 
     Supervisor.init(children, strategy: :one_for_one)

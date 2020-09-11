@@ -6,7 +6,7 @@ defmodule Msg.Server.SocketAcceptor do
   for further processing as fast as possible to allow more incoming connections to
   be handled.
   """
-  use Task
+  use Task, restart: :permanent
   alias Msg.Server.Connection.Authenticator
 
 
@@ -23,9 +23,12 @@ defmodule Msg.Server.SocketAcceptor do
   Will continue listening until interrupted.
   """
   def accept_loop(listen_socket) do
-    {:ok, transport_socket} = :ssl.transport_accept(listen_socket)
-    {:ok, ssl_socket} = :ssl.handshake(transport_socket)
-    Authenticator.authenticate(ssl_socket, Msg.Server.ConnectionSupervisor)
+    with {:ok, transport_socket} <- :ssl.transport_accept(listen_socket),
+         {:ok, ssl_socket} <- :ssl.handshake(transport_socket)
+    do
+      Authenticator.authenticate(ssl_socket, Msg.Server.ConnectionSupervisor)
+    end
+    
     accept_loop(listen_socket)
   end
 
