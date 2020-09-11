@@ -11,7 +11,7 @@ defmodule Msg.Application do
     children = [
       # Order matters when starting supervised processes that interact
       Msg.Server.ConnectionSupervisor,
-      {Msg.Server.SocketSupervisor, [server_port]}
+      {Msg.Server.SocketSupervisor, server_port}
     ]
 
     opts = [strategy: :one_for_one, name: Msg.Supervisor]
