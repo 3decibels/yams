@@ -29,9 +29,13 @@ defmodule Msg.Server.Connection.Echo do
 
 
   @impl true
-  def handle_info({:ssl_closed, _socket}, %Connection{tls_socket: _tls_socket} = conn) do
+  def handle_info({:ssl_closed, _socket}, conn) do
     Logger.info("Received TLS close, shutting down echo server")
     {:stop, :normal, conn}
   end
+
+
+  @impl true
+  def terminate(_reason, %Connection{tls_socket: tls_socket} = _conn), do: :ssl.close(tls_socket)
 
 end

@@ -22,6 +22,7 @@ defmodule Msg.Server.Connection do
   def send_msg(pid, msg), do: GenServer.call(pid, {:send_msg, msg})
 
 
+  # Initialize a connection with a TLS socket
   @impl true
   def init(%Connection{tls_socket: tls_socket} = conn) do
     :ssl.controlling_process(tls_socket, self())
@@ -29,6 +30,7 @@ defmodule Msg.Server.Connection do
   end
 
 
+  # Handle a call to send a message over the connection
   @impl true
   def handle_call({:send_msg, msg}, _from_pid, %Connection{tls_socket: tls_socket} = conn) do
     response = :ssl.send(tls_socket, msg)
@@ -36,11 +38,17 @@ defmodule Msg.Server.Connection do
   end
 
 
+  # Handle the TLS socket closing
   @impl true
   def handle_info({:ssl_closed, _socket}, %Connection{tls_socket: _tls_socket} = conn) do
     Logger.info("Received TLS close, shutting down connection")
     {:stop, :normal, conn}
   end
+
+
+  # Nicely close the TLS socket on termination
+  @impl true
+  def terminate(_reason, %Connection{tls_socket: tls_socket} = _conn), do: :ssl.close(tls_socket)
 
 
   def decode_protobuf_length(<<msb::1, lsb::7, tail::binary>> = data, acc \\ <<>>) when is_binary(data) and is_binary(acc) do
