@@ -2,7 +2,7 @@ defmodule Msg.Server.Connection.Echo do
   @moduledoc """
   This module implements a simple echo server on a TLS socket
   """
-  use GenServer, restart: :transient
+  use GenServer, restart: :temporary
   require Logger
   alias Msg.Server.Connection
 

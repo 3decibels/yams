@@ -2,7 +2,7 @@ defmodule Msg.Server.Connection do
   @moduledoc """
   This module allows interaction with the connection representing a remote device.
   """
-  use GenServer, restart: :transient
+  use GenServer, restart: :temporary
   alias __MODULE__
   require Logger
   defstruct tls_socket: nil, client_name: nil, unique_id: nil
