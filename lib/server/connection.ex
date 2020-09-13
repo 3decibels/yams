@@ -52,8 +52,8 @@ defmodule Msg.Server.Connection do
 
 
   @doc """
-  Takes a binary beginning with a base128 encoded length and returns a tuple with the decoded
-  length as an integer and the original supplied data with the base128 integer stripped off.
+  Takes a binary beginning with a base128 varint encoded length and returns a tuple with the decoded
+  length as an integer and the original supplied data with the base128 integer removed.
   """
   def decode_protobuf_length(<<msb::1, lsb::7, tail::binary>> = data, acc \\ <<>>) when is_binary(data) and is_bitstring(acc) do
      case msb do
@@ -64,13 +64,17 @@ defmodule Msg.Server.Connection do
 
 
   @doc """
-  Pads a protobuf base128 variant bitstring into a binary and converts into an integer
+  Pads a converted protobuf base128 varint bitstring into a binary and converts into an unsigned integer.
+
+  Assumes the varint has already been converted into the correct form with the most significant bits
+  in each group dropped and the remaining groups rearranged into the expected form (first group last,
+  next group before the first, etc).
   """
-  def protobuf_bitstring_to_int(<<msb::1, lsb::bitstring>> = data) when is_bitstring(data) do
+  def protobuf_bitstring_to_int(data) when is_bitstring(data) and rem(bit_size(data), 7) == 0 do
     padding_bits = 8 - rem(bit_size(data), 8)
-    padded = <<msb::1, 0::size(padding_bits), lsb::bitstring>>
+    padded = <<0::size(padding_bits), data::bitstring>>
     padded_bits = bit_size(padded)
-    <<int::size(padded_bits)-integer-signed>> = padded
+    <<int::size(padded_bits)-integer-unsigned>> = padded
     int
   end
 
