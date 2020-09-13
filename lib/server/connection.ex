@@ -71,10 +71,8 @@ defmodule Msg.Server.Connection do
   next group before the first, etc).
   """
   def protobuf_bitstring_to_int(data) when is_bitstring(data) and rem(bit_size(data), 7) == 0 do
-    padding_bits = 8 - rem(bit_size(data), 8)
-    padded = <<0::size(padding_bits), data::bitstring>>
-    padded_bits = bit_size(padded)
-    <<int::size(padded_bits)-integer-unsigned>> = padded
+    data_size = bit_size(data)
+    <<int::size(data_size)-integer-unsigned>> = data
     int
   end
 
