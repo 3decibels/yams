@@ -57,7 +57,7 @@ defmodule Msg.Server.Connection do
   """
   def decode_protobuf_length(<<msb::1, lsb::7, tail::binary>> = data, acc \\ <<>>) when is_binary(data) and is_bitstring(acc) do
      case msb do
-       0 -> {protobuf_bitstring_to_int(<<lsb::7, acc::bitstring>>), tail}
+       0 -> {decode_base128_int(<<lsb::7, acc::bitstring>>), tail}
        1 -> decode_protobuf_length(tail, <<lsb::7, acc::bitstring>>)
      end
   end
@@ -70,7 +70,7 @@ defmodule Msg.Server.Connection do
   in each group dropped and the remaining groups rearranged into the expected form (first group last,
   next group before the first, etc).
   """
-  def protobuf_bitstring_to_int(data) when is_bitstring(data) and rem(bit_size(data), 7) == 0 do
+  def decode_base128_int(data) when is_bitstring(data) and rem(bit_size(data), 7) == 0 do
     data_size = bit_size(data)
     <<int::size(data_size)-integer-unsigned>> = data
     int
