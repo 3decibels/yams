@@ -15,7 +15,8 @@ defmodule Msg.Server.Connection.Echo do
 
 
   @impl true
-  def init(%Connection{tls_socket: tls_socket} = conn) do
+  def init(%Connection{tls_socket: tls_socket, client_name: client_name} = conn) do
+    Logger.info("Starting up echo server for client #{client_name}")
     :ssl.controlling_process(tls_socket, self())
     {:ok, conn}
   end

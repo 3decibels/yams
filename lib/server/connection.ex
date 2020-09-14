@@ -5,7 +5,7 @@ defmodule Msg.Server.Connection do
   use GenServer, restart: :temporary
   alias __MODULE__
   require Logger
-  defstruct tls_socket: nil, client_name: nil, unique_id: nil
+  defstruct tls_socket: nil, client_name: nil, distinguished_name: nil, unique_id: nil
 
 
   @doc """

@@ -32,13 +32,27 @@ defmodule Msg.Server.Connection.Authenticator do
     # Authenticate connection and place under the passed dynamic supervisor.
     # Use case to evaluate return from separate auth function and start child under
     #   supervisor or simply exit.
-    case true do
-      false -> 
-        {:error, :auth_failed}
-      true -> 
-        #{:ok, pid} = DynamicSupervisor.start_child(supervisor, {Connection, %Connection{tls_socket: tls_socket}})
-        {:ok, _pid} = DynamicSupervisor.start_child(supervisor, {Msg.Server.Connection.Echo, %Connection{tls_socket: tls_socket}})
-        :ok
+    with {:ok, cert} <- :ssl.peercert(tls_socket),
+         %{serial_number: cert_serial, subject: cert_subject} <- EasySSL.parse_der(cert)
+    do
+      case true do
+        false -> 
+          {:error, :auth_failed}
+        true -> 
+          #{:ok, pid} = DynamicSupervisor.start_child(supervisor, {Connection, %Connection{tls_socket: tls_socket}})
+          {:ok, _pid} = DynamicSupervisor.start_child(supervisor, {Msg.Server.Connection.Echo,
+            %Connection{tls_socket: tls_socket, client_name: cert_subject[:CN], distinguished_name: cert_subject[:aggregated]}})
+          :ok
+      end
+    else
+      {:error, _reason} ->
+        :ssl.send(tls_socket, "Error: Could not parse cert")
+        :ssl.close(tls_socket)
+        {:error, :bad_cert}
+      _ ->
+        :ssl.send(tls_socket, "Error: Could not parse cert")
+        :ssl.close(tls_socket)
+        {:error, :unknown}
     end
   end
 
