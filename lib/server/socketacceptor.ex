@@ -7,6 +7,7 @@ defmodule Msg.Server.SocketAcceptor do
   be handled.
   """
   use Task, restart: :permanent
+  require Logger
   alias Msg.Server.Connection.Authenticator
 
 
@@ -27,8 +28,10 @@ defmodule Msg.Server.SocketAcceptor do
          {:ok, ssl_socket} <- :ssl.handshake(transport_socket)
     do
       Authenticator.authenticate(ssl_socket, Msg.Server.ConnectionSupervisor)
+    else
+      {:error, {:tls_alert, {:certificate_required, _}}} -> Logger.info("Peer did not present client certificate, closing connection")
     end
-    
+
     accept_loop(listen_socket)
   end
 

@@ -11,6 +11,7 @@ defmodule Msg.Application do
     children = [
       # Order matters when starting supervised processes that interact
       Msg.Server.ConnectionSupervisor,
+      Msg.Server.ConnectionRegistry,
       {Msg.Server.SocketSupervisor, server_port}
     ]
 

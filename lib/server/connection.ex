@@ -9,9 +9,10 @@ defmodule Msg.Server.Connection do
 
 
   @doc """
-  Starts a `Msg.Server.Connection` process linked to the current process
+  Starts a `Msg.Server.Connection` process linked to the current process.
   """
-  def start_link(%Connection{} = conn), do: GenServer.start_link(__MODULE__, conn)
+  def start_link(%Connection{client_name: client_name} = conn), do: GenServer.start_link(
+    __MODULE__, conn, name: via_tuple(client_name))
 
 
   @doc """
@@ -19,7 +20,7 @@ defmodule Msg.Server.Connection do
 
   Returns `:ok` on sucess or `{:error, reason}` on failure.
   """
-  def send_msg(pid, msg), do: GenServer.call(pid, {:send_msg, msg})
+  def send_msg(client_name, msg), do: GenServer.call(via_tuple(client_name), {:send_msg, msg})
 
 
   # Initialize a connection with a TLS socket
@@ -49,6 +50,10 @@ defmodule Msg.Server.Connection do
   # Nicely close the TLS socket on termination
   @impl true
   def terminate(_reason, %Connection{tls_socket: tls_socket} = _conn), do: :ssl.close(tls_socket)
+
+
+  # Allow processes to interact with the connection via connection registry
+  defp via_tuple(client_name), do: Msg.Server.ConnectionRegistry.via_tuple{__MODULE__, client_name}
 
 
   @doc """
