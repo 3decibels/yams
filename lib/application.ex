@@ -10,6 +10,8 @@ defmodule Msg.Application do
     server_port = Application.fetch_env!(:msg, :server_port)
     children = [
       # Order matters when starting supervised processes that interact
+      Msg.Server.ConversationSupervisor,
+      Msg.Server.ConversationRegistry,
       Msg.Server.ConnectionSupervisor,
       Msg.Server.ConnectionRegistry,
       {Msg.Server.SocketSupervisor, server_port}

@@ -24,7 +24,8 @@ defmodule Msg.MixProject do
     [
       {:easy_ssl, "~> 1.3.0"},
       {:ex_doc, "~> 0.22.2"},
-      {:protobuf, "~> 0.7.1"}
+      {:protobuf, "~> 0.7.1"},
+      {:uuid, "~> 1.1"}
       #{:varint, "~> 1.3"}
     ]
   end

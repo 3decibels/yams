@@ -5,7 +5,7 @@ defmodule Msg.Server.Connection do
   use GenServer, restart: :temporary
   alias __MODULE__
   require Logger
-  defstruct tls_socket: nil, client_name: nil, distinguished_name: nil, unique_id: nil
+  defstruct [:tls_socket, :client_name, :distinguished_name, :unique_id]
 
 
   @doc """
@@ -69,7 +69,7 @@ defmodule Msg.Server.Connection do
 
 
   @doc """
-  Pads a converted protobuf base128 varint bitstring into a binary and converts into an unsigned integer.
+  Converts a base128 varint bitstring into an unsigned integer.
 
   Assumes the varint has already been converted into the correct form with the most significant bits
   in each group dropped and the remaining groups rearranged into the expected form (first group last,
