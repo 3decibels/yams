@@ -12,6 +12,7 @@ defmodule Msg.Application do
       # Order matters when starting supervised processes that interact
       Msg.Server.ConversationSupervisor,
       Msg.Server.ConversationRegistry,
+      {Task.Supervisor, name: Msg.Server.AuthSupervisor},
       Msg.Server.ConnectionSupervisor,
       Msg.Server.ConnectionRegistry,
       {Msg.Server.SocketSupervisor, server_port}

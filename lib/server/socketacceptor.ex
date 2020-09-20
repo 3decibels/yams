@@ -27,7 +27,9 @@ defmodule Msg.Server.SocketAcceptor do
     with {:ok, transport_socket} <- :ssl.transport_accept(listen_socket),
          {:ok, ssl_socket} <- :ssl.handshake(transport_socket)
     do
-      Authenticator.authenticate(ssl_socket, Msg.Server.ConnectionSupervisor)
+      Task.Supervisor.start_child(Msg.Server.AuthSupervisor, Msg.Server.Connection.Authenticator,
+        :run, [ssl_socket, Msg.Server.ConnectionSupervisor])
+      #Authenticator.authenticate(ssl_socket, Msg.Server.ConnectionSupervisor)
     else
       {:error, {:tls_alert, {:certificate_required, _}}} -> Logger.info("Peer did not present client certificate, closing connection")
     end
