@@ -60,12 +60,9 @@ defmodule Msg.Server.Connection do
   Takes a binary beginning with a base128 varint encoded length and returns a tuple with the decoded
   length as an integer and the original supplied data with the base128 integer removed.
   """
-  def decode_protobuf_length(<<msb::1, lsb::7, tail::binary>> = data, acc \\ <<>>) when is_binary(data) and is_bitstring(acc) do
-     case msb do
-       0 -> {decode_base128_int(<<lsb::7, acc::bitstring>>), tail}
-       1 -> decode_protobuf_length(tail, <<lsb::7, acc::bitstring>>)
-     end
-  end
+  def decode_protobuf_length(data, acc \\ <<>>)
+  def decode_protobuf_length(<<0::1, lsb::7, tail::binary>>, acc) when is_bitstring(acc), do: {decode_base128_int(<<lsb::7, acc::bitstring>>), tail}
+  def decode_protobuf_length(<<1::1, lsb::7, tail::binary>>, acc) when is_bitstring(acc), do: decode_protobuf_length(tail, <<lsb::7, acc::bitstring>>)
 
 
   @doc """
