@@ -1,4 +1,4 @@
-defmodule Msg.Server.Connection do
+defmodule Yams.Server.Connection do
   @moduledoc """
   This module allows interaction with the connection representing a remote device.
   """
@@ -9,7 +9,7 @@ defmodule Msg.Server.Connection do
 
 
   @doc """
-  Starts a `Msg.Server.Connection` process linked to the current process.
+  Starts a `Yams.Server.Connection` process linked to the current process.
   """
   def start_link(%Connection{client_name: client_name} = conn), do: GenServer.start_link(
     __MODULE__, conn, name: via_tuple(client_name))
@@ -53,7 +53,7 @@ defmodule Msg.Server.Connection do
 
 
   # Allow processes to interact with the connection via connection registry
-  defp via_tuple(client_name), do: Msg.Server.ConnectionRegistry.via_tuple{__MODULE__, client_name}
+  defp via_tuple(client_name), do: Yams.Server.ConnectionRegistry.via_tuple{__MODULE__, client_name}
 
 
   @doc """

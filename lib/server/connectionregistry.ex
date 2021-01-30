@@ -1,10 +1,10 @@
-defmodule Msg.Server.ConnectionRegistry do
+defmodule Yams.Server.ConnectionRegistry do
   @moduledoc """
   This module registers connection processes for lookup
   """
 
   @doc """
-  Starts a `Msg.Server.ConnectionRegistry` process linked to the current process.
+  Starts a `Yams.Server.ConnectionRegistry` process linked to the current process.
   """
   def start_link(), do: Registry.start_link(keys: :unique, name: __MODULE__, partitions: System.schedulers_online())
 

@@ -1,23 +1,23 @@
-defmodule Msg.Server.SocketSupervisor do
+defmodule Yams.Server.SocketSupervisor do
   @moduledoc """
   This module opens a new socket for incoming connections and passes it to a static number
   of acceptor processes placed under supervision.
   """
   use Supervisor
-  alias Msg.Server.SocketAcceptor
+  alias Yams.Server.SocketAcceptor
 
 
   @doc """
-  Starts a `Msg.Server.SocketSupervisor` process linked to the current process
+  Starts a `Yams.Server.SocketSupervisor` process linked to the current process
   """
   def start_link(port_number) when is_integer(port_number), do: Supervisor.start_link(__MODULE__, port_number, name: __MODULE__)
 
 
   @impl true
   def init(port_number) do
-    ca_cert = Application.fetch_env!(:msg, :ca_cert)
-    server_cert = Application.fetch_env!(:msg, :server_cert)
-    server_key = Application.fetch_env!(:msg, :server_key)
+    ca_cert = Application.fetch_env!(:yams, :ca_cert)
+    server_cert = Application.fetch_env!(:yams, :server_cert)
+    server_key = Application.fetch_env!(:yams, :server_key)
 
     # TODO: Add some error handling to check the certificate files exist
     # Open socket for listening

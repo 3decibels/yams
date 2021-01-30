@@ -1,9 +1,9 @@
-defmodule Msg.MixProject do
+defmodule Yams.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :msg,
+      app: :yams,
       version: "0.1.0",
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
@@ -14,8 +14,8 @@ defmodule Msg.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      mod: {Msg.Application, []},
-      extra_applications: [:logger]
+      mod: {Yams.Application, []},
+      extra_applications: [:logger, :ssl]
     ]
   end
 

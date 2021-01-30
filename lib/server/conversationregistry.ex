@@ -1,10 +1,10 @@
-defmodule Msg.Server.ConversationRegistry do
+defmodule Yams.Server.ConversationRegistry do
   @moduledoc """
   This module registers Conversation processes for lookup
   """
 
   @doc """
-  Starts a `Msg.Server.ConversationRegistry` process linked to the current process.
+  Starts a `Yams.Server.ConversationRegistry` process linked to the current process.
   """
   def start_link(), do: Registry.start_link(keys: :unique, name: __MODULE__, partitions: System.schedulers_online())
 

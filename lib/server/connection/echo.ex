@@ -1,13 +1,13 @@
-defmodule Msg.Server.Connection.Echo do
+defmodule Yams.Server.Connection.Echo do
   @moduledoc """
   This module implements a simple echo server on a TLS socket
   """
   use GenServer, restart: :temporary
   require Logger
-  alias Msg.Server.Connection
+  alias Yams.Server.Connection
 
   @doc """
-  Starts a `Msg.Server.Connection.Echo` process linked to the current process
+  Starts a `Yams.Server.Connection.Echo` process linked to the current process
   """
   def start_link(%Connection{} = conn) do
     GenServer.start_link(__MODULE__, conn)

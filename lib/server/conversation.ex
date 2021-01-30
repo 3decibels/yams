@@ -1,4 +1,4 @@
-defmodule Msg.Server.Conversation do
+defmodule Yams.Server.Conversation do
   @moduledoc """
   This module persists information about conversations between devices and routes messages between them.
   """
@@ -8,7 +8,7 @@ defmodule Msg.Server.Conversation do
   defstruct [:uuid, participants: [], message_history: []]
 
   @doc """
-  Starts a `Msg.Server.Conversation` process linked to the current process.
+  Starts a `Yams.Server.Conversation` process linked to the current process.
   """
   def start_link(%Conversation{participants: participants, uuid: uuid} = conv) when is_list(participants) and is_integer(uuid),
     do: GenServer.start_link(__MODULE__, conv, name: via_tuple(uuid))
@@ -26,6 +26,6 @@ defmodule Msg.Server.Conversation do
 
 
   # Allow processes to interact with the connection via conversation registry
-  defp via_tuple(uuid), do: Msg.Server.ConnectionRegistry.via_tuple{__MODULE__, uuid}
+  defp via_tuple(uuid), do: Yams.Server.ConnectionRegistry.via_tuple{__MODULE__, uuid}
 
 end

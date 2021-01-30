@@ -1,11 +1,11 @@
-defmodule Msg.Server.ConversationSupervisor do
+defmodule Yams.Server.ConversationSupervisor do
   @moduledoc """
-  This module is responsible for the supervision of Msg.Server.Conversation processes
+  This module is responsible for the supervision of Yams.Server.Conversation processes
   """
   use DynamicSupervisor
 
   @doc """
-  Starts a `Msg.Server.ConversationSupervisor` process linked to the current process
+  Starts a `Yams.Server.ConversationSupervisor` process linked to the current process
   """
   def start_link(init_arg), do: DynamicSupervisor.start_link(__MODULE__, init_arg, name: __MODULE__)
 
