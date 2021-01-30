@@ -23,7 +23,7 @@ defmodule Yams.MixProject do
   defp deps do
     [
       {:easy_ssl, "~> 1.3.0"},
-      {:ecto, "~> 3.5"},
+      {:ecto_sql, "~> 3.5"},
       {:ex_doc, "~> 0.22.2"},
       {:myxql, "~> 0.4.5"},
       {:protobuf, "~> 0.7.1"},

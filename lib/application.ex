@@ -1,6 +1,6 @@
 defmodule Yams.Application do
   @moduledoc false
-  # Yams Application and master process supervisor
+  # Yams Application and main process supervisor
   use Application
 
 
@@ -10,6 +10,7 @@ defmodule Yams.Application do
     server_port = Application.fetch_env!(:yams, :server_port)
     children = [
       # Order matters when starting supervised processes that interact
+      Yams.Database.Repo,
       Yams.Server.ConversationSupervisor,
       Yams.Server.ConversationRegistry,
       {Task.Supervisor, name: Yams.Server.AuthSupervisor},
