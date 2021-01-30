@@ -4,6 +4,8 @@ defmodule YamsTest do
 
   test "decode protobuf length" do
     assert Yams.Server.Connection.decode_protobuf_length(<<172, 2>>) == {300, ""}
+    assert Yams.Server.Connection.decode_protobuf_length(
+      <<172, 2, 84, 101, 115, 116, 32, 115, 116, 114, 105, 110, 103>>) == {300, "Test string"}
   end
 
   test "base128 decode to unsigned integer" do
