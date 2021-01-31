@@ -10,7 +10,7 @@ defmodule Yams.Database.Repo.Migrations.CreateCertAuth do
       add :active, :boolean, null: false
     end
     create index("cert_auth", [:serial], unique: true)
-    create index("cert_auth", [:common_name], unique: true)
+    create index("cert_auth", [:common_name])
   end
 
 end
