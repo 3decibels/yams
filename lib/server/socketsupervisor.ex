@@ -5,6 +5,7 @@ defmodule Yams.Server.SocketSupervisor do
   """
   use Supervisor
   alias Yams.Server.SocketAcceptor
+  require Logger
 
 
   @doc """
@@ -18,17 +19,25 @@ defmodule Yams.Server.SocketSupervisor do
     ca_cert = Application.fetch_env!(:yams, :ca_cert)
     server_cert = Application.fetch_env!(:yams, :server_cert)
     server_key = Application.fetch_env!(:yams, :server_key)
+    acceptor_count = Application.fetch_env!(:yams, :acceptor_count)
 
-    # TODO: Add some error handling to check the certificate files exist
     # Open socket for listening
-    {:ok, listen_socket} = :ssl.listen(port_number, [reuseaddr: true, cacertfile: ca_cert, certfile: server_cert,
+    with true <- File.exists?(ca_cert),
+         true <- File.exists?(server_cert),
+         true <- File.exists?(server_key),
+         {:ok, listen_socket} <- :ssl.listen(port_number, [reuseaddr: true, cacertfile: ca_cert, certfile: server_cert,
       keyfile: server_key, verify: :verify_peer, fail_if_no_peer_cert: true])
-
-    children = for n <- 1..4 do
-      Supervisor.child_spec({SocketAcceptor, listen_socket}, id: :"socket_acceptor#{n}")
+    do
+      children = for n <- 1..acceptor_count do
+        Logger.info("Starting socket acceptor \##{n}")
+        Supervisor.child_spec({SocketAcceptor, listen_socket}, id: :"socket_acceptor#{n}")
+      end
+      Supervisor.init(children, strategy: :one_for_one)
+    else
+      _ ->
+        Logger.error("Failed to open SSL socket for listening")
+        {:error, :socket_failure}
     end
-
-    Supervisor.init(children, strategy: :one_for_one)
   end
 
 end

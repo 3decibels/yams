@@ -29,9 +29,11 @@ defmodule Yams.Server.SocketAcceptor do
       Task.Supervisor.start_child(Yams.Server.AuthSupervisor, Yams.Server.Connection.Authenticator,
         :run, [ssl_socket, Yams.Server.ConnectionSupervisor])
     else
-      {:error, {:tls_alert, {:certificate_required, _}}} -> Logger.info("Peer did not present client certificate, closing connection")
+      {:error, {:tls_alert, {:certificate_required, _}}} ->
+        Logger.debug("Peer did not present client certificate, closing connection")
+      _ ->
+        Logger.debug("Failed to initiate SSL connection with peer")
     end
-
     accept_loop(listen_socket)
   end
 
