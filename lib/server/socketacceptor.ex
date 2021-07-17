@@ -8,7 +8,6 @@ defmodule Yams.Server.SocketAcceptor do
   """
   use Task, restart: :permanent
   require Logger
-  alias Yams.Server.Connection.Authenticator
 
 
   @doc """
@@ -29,7 +28,6 @@ defmodule Yams.Server.SocketAcceptor do
     do
       Task.Supervisor.start_child(Yams.Server.AuthSupervisor, Yams.Server.Connection.Authenticator,
         :run, [ssl_socket, Yams.Server.ConnectionSupervisor])
-      #Authenticator.authenticate(ssl_socket, Yams.Server.ConnectionSupervisor)
     else
       {:error, {:tls_alert, {:certificate_required, _}}} -> Logger.info("Peer did not present client certificate, closing connection")
     end
