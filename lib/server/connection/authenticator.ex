@@ -46,11 +46,11 @@ defmodule Yams.Server.Connection.Authenticator do
       end
     else
       {:error, _reason} ->
-        :ssl.send(tls_socket, "Error: Could not parse cert")
+        :ssl.send(tls_socket, "Error: Could not parse client cert")
         :ssl.close(tls_socket)
         {:error, :bad_cert}
       _ ->
-        :ssl.send(tls_socket, "Error: Could not parse cert")
+        :ssl.send(tls_socket, "Error: Could not authenticate client")
         :ssl.close(tls_socket)
         {:error, :unknown}
     end
