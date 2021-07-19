@@ -4,6 +4,8 @@ defmodule Yams.Server.Connection.Authenticator do
   perform authentication of the remote device using the supplied client certificate.
   """
   use Task
+  import Ecto.Query, only: [from: 2]
+  alias Yams.Database.CertAuth
   alias Yams.Server.Connection
 
 
@@ -35,7 +37,10 @@ defmodule Yams.Server.Connection.Authenticator do
     with {:ok, cert} <- :ssl.peercert(tls_socket),
          %{serial_number: cert_serial, subject: cert_subject} <- EasySSL.parse_der(cert)
     do
-      case true do
+      query = from c in CertAuth,
+        where: c.cert_serial == ^cert_serial,
+        where: c.active == true
+      case Yams.Database.Repo.exists?(query) do
         false -> 
           {:error, :auth_failed}
         true -> 
