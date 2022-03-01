@@ -3,22 +3,9 @@ defmodule Yams.Server.Connection.Authenticator do
   This module is responsible for creating tasks that start TLS on sockets and
   perform authentication of the remote device using the supplied client certificate.
   """
-  use Task
   import Ecto.Query, only: [from: 2]
   alias Yams.Database.CertAuth
   alias Yams.Server.Connection
-
-
-  @doc """
-  Spawns a task to start TLS and perform authentication on a `socket`.
-
-  If authentication is successful the socket will be placed into a `Yams.Server.Connection`
-  to be run under the specified dynamic `supervisor`.
-
-  This function is used for the side effect only. Returns tuple `{:ok, pid}` with the pid
-  of the started authentication task. The result of the task is not returned.
-  """
-  def authenticate(tls_socket, supervisor), do: Task.start(__MODULE__, :run, [tls_socket, supervisor])
 
 
   @doc """
@@ -38,10 +25,12 @@ defmodule Yams.Server.Connection.Authenticator do
          %{serial_number: cert_serial, subject: cert_subject} <- EasySSL.parse_der(cert)
     do
       query = from c in CertAuth,
-        where: c.cert_serial == ^cert_serial,
+        where: c.serial == ^cert_serial,
         where: c.active == true
       case Yams.Database.Repo.exists?(query) do
         false -> 
+          :ssl.send(tls_socket, "Error: Authentication failed")
+          :ssl.close(tls_socket)
           {:error, :auth_failed}
         true -> 
           #{:ok, pid} = DynamicSupervisor.start_child(supervisor, {Connection, %Connection{tls_socket: tls_socket}})

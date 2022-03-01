@@ -3,7 +3,7 @@ defmodule Yams.Database.Repo.Migrations.CreateCertAuth do
 
   def change do
     create table("cert_auth", primary_key: false) do
-      add :serial, :integer, null: false, primary_key: true
+      add :serial, :bigint, null: false, primary_key: true
       add :common_name, :string, null: false
       add :encoded_cert, :string, null: false
       add :expiration, :utc_datetime, null: false
