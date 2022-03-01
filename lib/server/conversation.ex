@@ -25,7 +25,7 @@ defmodule Yams.Server.Conversation do
   def init(%Conversation{} = conv), do: {:ok, conv}
 
 
-  # Allow processes to interact with the connection via conversation registry
-  defp via_tuple(uuid), do: Yams.Server.ConnectionRegistry.via_tuple{__MODULE__, uuid}
+  # Allow processes to interact with the conversation via conversation registry
+  defp via_tuple(uuid), do: Yams.Server.ConversationRegistry.via_tuple{__MODULE__, uuid}
 
 end
