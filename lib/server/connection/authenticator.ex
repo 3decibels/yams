@@ -4,6 +4,7 @@ defmodule Yams.Server.Connection.Authenticator do
   perform authentication of the remote device using the supplied client certificate.
   """
   import Ecto.Query, only: [from: 2]
+  require Logger
   alias Yams.Database.CertAuth
   alias Yams.Server.Connection
 
@@ -20,8 +21,9 @@ defmodule Yams.Server.Connection.Authenticator do
   def run(tls_socket, supervisor) do
     with {:ok, cert} <- :ssl.peercert(tls_socket),
          %{serial_number: cert_serial, subject: cert_subject} <- EasySSL.parse_der(cert),
-         :ok <- cert_is_active?(String.upcase(cert_serial))
+         :ok <- cert_allowed?(String.upcase(cert_serial))
     do
+      Logger.info("Authentication succeeded for client with common name: #{cert_subject[:CN]}")
       {:ok, _pid} = DynamicSupervisor.start_child(supervisor, {Yams.Server.Connection.Echo,
         %Connection{tls_socket: tls_socket, client_name: cert_subject[:CN], distinguished_name: cert_subject[:aggregated]}})
       :ok
@@ -47,7 +49,7 @@ defmodule Yams.Server.Connection.Authenticator do
 
   Returns `:ok` on success or `{:error, reason}` on failure.
   """
-  def cert_is_active?(serial) when is_binary(serial) do
+  def cert_allowed?(serial) when is_binary(serial) do
     query = from c in CertAuth,
         where: c.serial == ^serial,
         where: c.active == true
