@@ -20,7 +20,7 @@ defmodule Yams.Server.Connection.Authenticator do
   def run(tls_socket, supervisor) do
     with {:ok, cert} <- :ssl.peercert(tls_socket),
          %{serial_number: cert_serial, subject: cert_subject} <- EasySSL.parse_der(cert),
-         :ok <- cert_is_active?(cert_serial)
+         :ok <- cert_is_active?(String.upcase(cert_serial))
     do
       {:ok, _pid} = DynamicSupervisor.start_child(supervisor, {Yams.Server.Connection.Echo,
         %Connection{tls_socket: tls_socket, client_name: cert_subject[:CN], distinguished_name: cert_subject[:aggregated]}})
