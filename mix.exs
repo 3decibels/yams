@@ -26,7 +26,6 @@ defmodule Yams.MixProject do
       {:ecto_sql, "~> 3.5"},
       {:ex_doc, "~> 0.22.2"},
       {:myxql, "~> 0.4.5"},
-      {:protobuf, "~> 0.7.1"},
       {:uuid, "~> 1.1"}
       #{:varint, "~> 1.3"}
     ]
