@@ -4,6 +4,7 @@ defmodule Yams.Server.Connection do
   """
   use GenServer, restart: :temporary
   alias __MODULE__
+  alias Yams.Server.Connection.Message
   require Logger
   defstruct [:tls_socket, :client_name, :distinguished_name, :unique_id]
 
@@ -20,13 +21,14 @@ defmodule Yams.Server.Connection do
 
   Returns `:ok` on sucess or `{:error, reason}` on failure.
   """
-  def send_msg(client_name, msg), do: GenServer.call(via_tuple(client_name), {:send_msg, msg})
+  def send_msg(msg, client_name), do: GenServer.call(via_tuple(client_name), {:send_msg, msg})
 
 
   # Initialize a connection with a TLS socket
   @impl true
   def init(%Connection{tls_socket: tls_socket} = conn) do
     :ssl.controlling_process(tls_socket, self())
+    :ssl.setopts(tls_socket, [:binary, packet: 2])
     {:ok, conn}
   end
 
@@ -36,6 +38,14 @@ defmodule Yams.Server.Connection do
   def handle_call({:send_msg, msg}, _from_pid, %Connection{tls_socket: tls_socket} = conn) do
     response = :ssl.send(tls_socket, msg)
     {:reply, response, conn}
+  end
+
+
+  # Handle an incoming message on the SSL socket
+  @impl true
+  def handle_info({:ssl, _socket, data}, conn) do
+    Message.decode_message(data) |> handle_message(conn)
+    {:noreply, conn}
   end
 
 
@@ -54,6 +64,23 @@ defmodule Yams.Server.Connection do
 
   # Allow processes to interact with the connection via connection registry
   defp via_tuple(client_name), do: Yams.Server.ConnectionRegistry.via_tuple{__MODULE__, client_name}
+
+
+  # Handles an incoming message.
+  defp handle_message(%Message{opcode: :heartbeat_request}, %Connection{} = conn) do
+    %Message{opcode: :heartbeat_response, data: <<>>}
+    |> Message.encode_message()
+    |> send_msg(conn.client_name)
+  end
+  defp handle_message(%Message{opcode: :heartbeat_response}, %Connection{}) do
+    :ok
+  end
+  defp handle_message(%Message{opcode: _}, %Connection{}) do
+    {:error, :unhandled_opcode}
+  end
+  defp handle_message(_, _) do
+    {:error, :unknown}
+  end
 
 
   @doc """
